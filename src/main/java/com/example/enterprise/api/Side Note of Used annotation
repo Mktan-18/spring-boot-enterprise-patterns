@@ -1,0 +1,64 @@
+Http request flow-
+step1-
+
+RequestBody → Deserialization
+Spring reads the HTTP request body (JSON / XML)
+Uses HttpMessageConverter (Jackson by default)
+Converts JSON → Java object
+{
+  "orderId": "",
+  "quantity": 0
+}
+Java object is created even if values are invalid
+At this stage:
+@NotNull
+@Size
+@NotBlank
+are NOT checked yet
+-----------------------------
+Step2-
+@Valid → Bean Validation
+
+Now Spring sees @Valid and triggers: JSR-380 / Jakarta Bean Validation
+
+Uses annotations like defined in your models/dto:
+@NotNull
+@NotBlank
+@Size
+@Min
+
+Runs after deserialization. But Runs before controller method body
+If validation fails:
+
+Controller method is NOT executed
+MethodArgumentNotValidException is thrown, which again can be handled in Global Exception Handler defined as @ControllerAdvice
+-----------------------------------------
+
+Use @PathVariable to identify a resource. need explicit action on the URI mapping, I use @PathVariable when the value uniquely identifies the resource being operated on.”
+
+Use @RequestParam to modify or filter how you operate on that resource. Query parameters @RequestParam to define the api how the data is retrieved like filter etc
+Usually optional
+
+Appears after ?
+Does not identify the resource
+
+Often used for:
+filtering, sorting, pagination,flags
+GET /orders?status=CREATED&userId=U123
+@GetMapping("/orders")
+ResponseEntity<List<OrderResponse>> getOrders(
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) String userId
+);
+----------------------------------
+Swagger is for API consumers, which may include:
+Swagger (OpenAPI) is primarily used to communicate the API contract clearly to consumers
+ — both technical and non-technical stakeholders — by providing a visual, interactive,
+  and self-describing representation of the API.
+
+Frontend developers
+Mobile developers
+QA engineers
+Integration partners
+Product owners / clients (non-coding, but API-aware)
+----------------------------------------------------
